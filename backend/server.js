@@ -1,0 +1,60 @@
+import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
+import connectDB from "./config/db.js";
+import auth from './controllers/auth.js'
+import group from './controllers/group.js'
+import submission from './controllers/submission.js'
+import leaderBoard from './controllers/leaderBoard.js'
+import global from './controllers/globalController.js'
+import cron from 'node-cron'
+import {calculateGlobalWinner, generateDailyGlobalPrompt} from './controllers/globalController.js'
+import { calculateGroupWinners } from "./controllers/leaderBoard.js";
+import { apiLimiter } from "./middleware/rateLimiter.js";
+import helmet from "helmet";
+import cors from 'cors'
+
+connectDB();
+
+const app = express();
+
+app.use(express.json())
+app.use(helmet());
+app.use(cors())
+
+app.use('/auth', auth)
+app.use('/group', group)
+app.use('/submission', submission)
+app.use('/leaderboard', leaderBoard)
+app.use('/global', global)
+
+app.use("/auth", apiLimiter);
+app.use('/group', apiLimiter)
+app.use("/submission", apiLimiter);
+app.use('/leaderboard', apiLimiter)
+app.use('/global', apiLimiter)
+
+cron.schedule("0 0 * * *", () => {
+  console.log("Generating global prompt...");
+  generateDailyGlobalPrompt();
+});
+
+cron.schedule("0 21 * * *", () => {
+  console.log("Calculating global winner...");
+  calculateGlobalWinner();
+});
+
+cron.schedule("0 21 * * *", async () => {
+  console.log("Running group winner calculations...");
+
+  const groups = await Group.find();
+
+  for (const group of groups) {
+    await calculateGroupWinners(group._id);
+  }
+});
+
+
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
+});
