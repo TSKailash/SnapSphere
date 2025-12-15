@@ -14,6 +14,11 @@ router.post("/send-otp", async (req, res) => {
 
     if (!email) return res.status(400).json({ message: "Email is required" });
 
+    const exists = await User.findOne({ email: email });
+    if (exists) {
+      return res.status(400).json({ message: "Email already registered" });
+    }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     await Otp.create({ email, otp });

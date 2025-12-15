@@ -9,10 +9,10 @@ router.post('/upload', protect, upload.single('image'), async(req, res)=>{
     try {
         const {prompt, groupId, isGlobal}=req.body;
         if(!req.file){
-            res.status(400).json({message: "File is required"})
+            return res.status(400).json({message: "File is required"})
         }
         if(!prompt){
-            res.status(400).json({message: "Prompt is required"})
+            return res.status(400).json({message: "Prompt is required"})
         }
         const today = new Date();
         today.setHours(0, 0, 0, 0);

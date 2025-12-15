@@ -7,7 +7,7 @@ const Navbar = () => {
   return (
     <nav className="w-full bg-black text-white px-6 py-4 flex items-center justify-between">
       {/* Left - Logo */}
-      <Link to="/home" className="text-2xl font-bold tracking-wide">
+      <Link to="/" className="text-2xl font-bold tracking-wide">
         SnapSphere
       </Link>
 

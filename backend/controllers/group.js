@@ -106,13 +106,17 @@ router.post('/join', protect, async(req, res)=>{
     try {
         const {groupCode}=req.body
         if(!groupCode){
-            res.status(400).json({message: "Group code is necessary"})
+            return res.status(400).json({message: "Group code is necessary"})
         }
         const user_id=req.user._id
-        const group=await Group.find({groupCode: groupCode})
+        const group=await Group.findOne({groupCode: groupCode})
         
         if(!group){
-            res.status(400).json({message: "Invalid Group Code"})
+            return res.status(400).json({message: "Invalid Group Code"})
+        }
+
+        if (group.members.includes(user_id)) {
+          return res.status(400).json({ message: "You are already in this group" });
         }
         
         group.members.push(user_id)
@@ -122,7 +126,7 @@ router.post('/join', protect, async(req, res)=>{
         await User.findByIdAndUpdate(user_id, {
             $push: {groupsJoined: group._id}
         })
-        res.status(200).json({message: "Joined group", group})
+        return res.status(200).json({message: "Joined group", group})
         
         
     } catch (error) {

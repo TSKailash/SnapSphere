@@ -10,28 +10,35 @@ const groupSchema=new mongoose.Schema({
         required: true,
         unique: true
     },
-    members:[
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        }
-    ],
+    members: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: []
+    },
     dailyPrompt: {
         type: String,
         default: ""
     },
-    submissions: [
+    submissions: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Submission",
+      default: [], // ✅ IMPORTANT
+    },
+    leaderBoard: {
+      type: [
         {
+          userId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Submission"
-        }
-    ],
-    leaderBoard: [
-        {
-            userId: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
-            points: {type: Number, default: 0}
-        }
-    ]
+            ref: "User",
+          },
+          points: {
+            type: Number,
+            default: 0,
+          },
+        },
+      ],
+      default: [], // ✅ IMPORTANT
+    },
 },
 {timestamps: true}
 )

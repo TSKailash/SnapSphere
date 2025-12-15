@@ -18,9 +18,10 @@ connectDB();
 
 const app = express();
 
+app.use(cors())
 app.use(express.json())
 app.use(helmet());
-app.use(cors())
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/auth', auth)
 app.use('/group', group)

@@ -22,9 +22,15 @@ const Register = () => {
   // STEP 1: Send OTP
   const sendOtp = async (e) => {
     e.preventDefault();
-    await api.post("/auth/send-otp", { email: form.email });
-    setStep(2);
+
+    try {
+      await api.post("/auth/send-otp", { email: form.email });
+      setStep(2);
+    } catch (error) {
+      alert(error.response?.data?.message || "Something went wrong");
+    }
   };
+
 
   // STEP 2: Verify OTP
   const verifyOtp = async (e) => {
@@ -46,7 +52,7 @@ const Register = () => {
     });
 
     await login(form.email, form.password);
-    navigate("/home");
+    navigate("/dashboard");
   };
 
   return (
