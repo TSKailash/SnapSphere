@@ -25,10 +25,10 @@ app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/auth', apiLimiter, auth)
-app.use('/group', apiLimiter, group)
+app.use('/group', group)
 app.use('/submission', apiLimiter, submission)
-app.use('/leaderboard', apiLimiter, leaderBoard)
-app.use('/global', apiLimiter, global)
+app.use('/leaderboard', leaderBoard)
+app.use('/global', global)
 
 cron.schedule("0 0 * * *", () => {
   console.log("Generating global prompt...");
