@@ -58,7 +58,7 @@ export const calculateGlobalWinner = async () => {
 
   const winner = submissions[0];
 
-  await globalLeaderBoardModel.findOneAndUpdate(
+  await GlobalLeaderBoardModel.findOneAndUpdate(
     { userId: winner.userId },
     { $inc: { points: 20 } },
     { upsert: true, new: true }

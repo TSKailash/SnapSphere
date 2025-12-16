@@ -57,6 +57,6 @@ cron.schedule("5 21 * * *", async () => {
 
 
 
-app.listen(5000, () => {
+app.listen(process.env.PORT, () => {
   console.log("Server running on port 5000");
 });
