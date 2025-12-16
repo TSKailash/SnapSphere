@@ -39,6 +39,10 @@ const groupSchema=new mongoose.Schema({
       ],
       default: [], // ✅ IMPORTANT
     },
+    lastCalculatedAt: {
+      type: Date,
+      default: null
+    }
 },
 {timestamps: true}
 )

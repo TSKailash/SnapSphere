@@ -13,6 +13,7 @@ import { calculateGroupWinners } from "./controllers/leaderBoard.js";
 import { apiLimiter } from "./middleware/rateLimiter.js";
 import helmet from "helmet";
 import cors from 'cors'
+import Group from "./models/groupModel.js";
 
 connectDB();
 
@@ -23,17 +24,11 @@ app.use(express.json())
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/auth', auth)
-app.use('/group', group)
-app.use('/submission', submission)
-app.use('/leaderboard', leaderBoard)
-app.use('/global', global)
-
-app.use("/auth", apiLimiter);
-app.use('/group', apiLimiter)
-app.use("/submission", apiLimiter);
-app.use('/leaderboard', apiLimiter)
-app.use('/global', apiLimiter)
+app.use('/auth', apiLimiter, auth)
+app.use('/group', apiLimiter, group)
+app.use('/submission', apiLimiter, submission)
+app.use('/leaderboard', apiLimiter, leaderBoard)
+app.use('/global', apiLimiter, global)
 
 cron.schedule("0 0 * * *", () => {
   console.log("Generating global prompt...");
@@ -45,15 +40,21 @@ cron.schedule("0 21 * * *", () => {
   calculateGlobalWinner();
 });
 
-cron.schedule("0 21 * * *", async () => {
-  console.log("Running group winner calculations...");
+cron.schedule("5 21 * * *", async () => {
+  try {
+    console.log("Running group winner calculations...");
+    const groups = await Group.find();
 
-  const groups = await Group.find();
+    for (const group of groups) {
+      await calculateGroupWinners(group._id);
+    }
 
-  for (const group of groups) {
-    await calculateGroupWinners(group._id);
+    console.log("Group leaderboard update completed");
+  } catch (err) {
+    console.error("Group cron failed:", err);
   }
 });
+
 
 
 app.listen(5000, () => {

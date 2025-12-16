@@ -7,6 +7,9 @@ import ProtectedRoute from './utils/Protection'
 import Navbar from './components/Navbar'
 import Group from './pages/Group'
 import DashBoard from './pages/DashBoard'
+import GroupDetail from './pages/GroupDetail'
+import GlobalLeaderboard from './pages/GlobalLeaderBoard'
+import Profile from './pages/Profile'
 
 const App = () => {
   return (
@@ -26,6 +29,30 @@ const App = () => {
           element={
             <ProtectedRoute>
               <DashBoard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/groups/:groupId"
+          element={
+            <ProtectedRoute>
+              <GroupDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            <ProtectedRoute>
+              <GlobalLeaderboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

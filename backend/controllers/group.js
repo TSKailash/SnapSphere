@@ -138,17 +138,32 @@ router.post('/join', protect, async(req, res)=>{
 router.get("/:id", protect, async (req, res) => {
   try {
     const group = await Group.findById(req.params.id)
-      .populate("members", "username email")
-      .populate("submissions");
+      .populate("members", "username email");
 
-    if (!group)
+    if (!group) {
       return res.status(404).json({ message: "Group not found" });
+    }
 
-    res.status(200).json(group);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const submissions = await Submission.find({
+      groupId: group._id,
+      createdAt: { $gte: today },
+      isGlobal: false
+    })
+      .populate("userId", "username")
+      .sort({ votes: -1 });
+
+    res.status(200).json({
+      group,
+      submissions
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 export default router

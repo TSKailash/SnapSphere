@@ -3,7 +3,7 @@ import { globalPrompts } from "../data/globalPrompts.js";
 import Submission from "../models/submissionModel.js";
 import protect from "../middleware/authMiddleware.js";
 import express from 'express'
-import globalLeaderBoardModel from "../models/globalLeaderBoardModel.js";
+import GlobalLeaderBoardModel from "../models/globalLeaderBoardModel.js";
 
 const router=express.Router()
 
@@ -126,7 +126,7 @@ router.get("/today-winner", protect, async (req, res) => {
 
 router.get("/leaderboard", protect, async (req, res) => {
   try {
-    const leaderboard = await GlobalLeaderBoard.find()
+    const leaderboard = await GlobalLeaderBoardModel.find()
       .sort({ points: -1 })
       .populate("userId", "username");
 

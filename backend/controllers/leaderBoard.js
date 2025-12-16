@@ -9,6 +9,12 @@ export const calculateGroupWinners = async (groupId) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0); 
 
+  const group = await Group.findById(groupId);
+
+  if (group.lastCalculatedAt && group.lastCalculatedAt >= today) {
+    return { message: "Already calculated today" };
+  }
+
   const submissions = await Submission.find({
     groupId,
     createdAt: { $gte: today }
@@ -34,6 +40,8 @@ export const calculateGroupWinners = async (groupId) => {
       arrayFilters: [{ "elem.userId": update.userId }]
     });
   }
+  group.lastCalculatedAt = new Date();
+  await group.save();
 
   return { message: "Leaderboard updated", winners: winnerUpdates };
 };
@@ -49,7 +57,7 @@ router.post("/calculate/:groupId", protect, async (req, res) => {
   }
 });
 
-router.get("/leaderboard/:groupId", protect, async (req, res) => {
+router.get("/:groupId", protect, async (req, res) => {
   try {
     const group = await Group.findById(req.params.groupId)
       .populate("leaderBoard.userId", "username email");
