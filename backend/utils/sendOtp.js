@@ -16,18 +16,6 @@ const transporter = nodemailer.createTransport({
 });
 
 
-console.log("EMAIL_HOST =", process.env.SMTP_HOST);
-console.log("EMAIL_PORT =", process.env.SMTP_PORT);
-
-transporter.verify((err, success) => {
-  if (err) {
-    console.error("❌ SMTP ERROR:", err);
-  } else {
-    console.log("✅ Brevo SMTP Ready");
-  }
-});
-
-
 const sendOTP = async (email, otp) => {
   try {
     await transporter.sendMail({

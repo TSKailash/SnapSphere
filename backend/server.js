@@ -14,6 +14,7 @@ import { apiLimiter } from "./middleware/rateLimiter.js";
 import helmet from "helmet";
 import cors from 'cors'
 import Group from "./models/groupModel.js";
+import cronRoutes from './routers/cronRoutes.js'
 
 connectDB();
 
@@ -29,6 +30,8 @@ app.use('/group', group)
 app.use('/submission', apiLimiter, submission)
 app.use('/leaderboard', leaderBoard)
 app.use('/global', global)
+app.use("/cron", cronRoutes);
+
 
 cron.schedule(
   "0 0 * * *",
