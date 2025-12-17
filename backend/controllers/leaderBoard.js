@@ -2,6 +2,7 @@ import Group from "../models/groupModel.js";
 import Submission from "../models/submissionModel.js";
 import express from 'express'
 import protect from "../middleware/authMiddleware.js";
+import User from "../models/userModel.js";
 
 const router=express.Router()
 
@@ -39,6 +40,10 @@ export const calculateGroupWinners = async (groupId) => {
     }, {
       arrayFilters: [{ "elem.userId": update.userId }]
     });
+    await User.findByIdAndUpdate(
+      update.userId,
+      { $inc: { points: update.points } }
+    )
   }
   group.lastCalculatedAt = new Date();
   await group.save();

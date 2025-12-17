@@ -4,6 +4,7 @@ import Submission from "../models/submissionModel.js";
 import protect from "../middleware/authMiddleware.js";
 import express from 'express'
 import GlobalLeaderBoardModel from "../models/globalLeaderBoardModel.js";
+import User from "../models/userModel.js";
 
 const router=express.Router()
 
@@ -63,6 +64,11 @@ export const calculateGlobalWinner = async () => {
     { $inc: { points: 20 } },
     { upsert: true, new: true }
   );
+
+  await User.findByIdAndUpdate(
+    winner.userId,
+    { $inc: { globalPoints: 20 } }
+  )
 
   return {
     message: "Global winner selected",

@@ -3,12 +3,13 @@ import bcrypt from "bcryptjs";
 import User from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
 import Otp from '../models/otp.js'
-import sendOTP from "../utils/sendOtp.js";
+import {sendOTP} from "../utils/sendOtp.js";
 import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/send-otp", async (req, res) => {
+  console.log("🔥🔥 SEND OTP ROUTE HIT 🔥🔥");
   try {
     const { email } = req.body;
 
@@ -20,6 +21,7 @@ router.post("/send-otp", async (req, res) => {
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(otp)
 
     await Otp.create({ email, otp });
 
@@ -27,37 +29,45 @@ router.post("/send-otp", async (req, res) => {
 
     res.status(200).json({ message: "OTP sent to email" });
   } catch (err) {
-    console.log(err);
+    console.error("❌ SEND OTP ERROR FULL:", err);
     res.status(500).json({ message: "Error sending OTP" });
   }
 });
 
 router.post("/register", async (req, res) => {
-  const { username, email, password } = req.body;
+  try {
+    const { username, email, password } = req.body;
 
-  if (!username || !email || !password) {
-    return res.status(400).json({ message: "All fields required" });
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+
+    const exists = await User.findOne({ email });
+    if (exists) {
+      return res.status(400).json({ message: "Email already registered" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    return res.status(201).json({
+      message: "Registration successful",
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+      token: generateToken(user._id),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
-
-  const exists = await User.findOne({ email });
-  if (exists) {
-    return res.status(400).json({ message: "Email already registered" });
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await User.create({
-    username,
-    email,
-    password: hashedPassword
-  });
-
-  await Otp.deleteMany({ email });
-
-  res.status(201).json({
-    message: "Registration successful",
-    token: generateToken(user._id)
-  });
 });
 
 
